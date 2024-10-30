@@ -1,0 +1,53 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |				
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  9                                   	
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    format      ascii;
+    class       dictionary;
+    object      functionObject;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+functions
+{
+
+///////////////////////////////////////////////////////////////////////////
+
+gradient_aposteriori
+{
+    type                grad;
+    functionObjectLibs  ("libfieldFunctionObjects.so");
+
+    //Remember to add in fvSchemse how to compute the gradient
+    //In this case grad(rho)
+    field "rho";
+
+    //Numerical Schlieren
+    result "gradient_rho";        	//output field name - Optional 
+}
+
+///////////////////////////////////////////////////////////////////////////
+
+///////////////////////////////////////////////////////////////////////////
+
+div_gradient_aposteriori
+{
+    type                div;
+    functionObjectLibs  ("libfieldFunctionObjects.so");
+
+    //Remember to add in fvSchemse how to compute the divergence
+    //In this case div(gradient_rho)
+    field "gradient_rho";
+
+    //Numerical shadowgraph (Laplacian of the gradient or divergence of the gradient).
+    //result "div_gradient_rho";        //output field name - Optional 
+}
+
+///////////////////////////////////////////////////////////////////////////
+
+}

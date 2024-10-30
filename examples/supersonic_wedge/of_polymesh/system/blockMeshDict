@@ -1,0 +1,164 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |				
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  9                                   	
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    format      ascii;
+    class       dictionary;
+    object      blockMeshDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+convertToMeters 1;
+
+xmin  0;
+xmax  0.5;
+ymin  0;
+ymax  1.5;
+zmin  0;
+zmax  1;
+
+xmin1  0.5;
+xmax1  1.5;
+ymin1  0;
+yangle 0.364;	//20 deg
+ymax1  1.5;
+zmin1  0;
+zmax1  1;
+
+//xcells 10;
+//ycells 10;
+zcells 1;
+
+//For block 1
+lx #calc "$xmax - $xmin";
+//dx 0.04;
+dx 0.02;
+//dx 0.01;
+xcells #calc "abs(($lx)/($dx))";
+
+ly #calc "$ymax - $ymin";
+//dy 0.04;
+dy 0.02;
+//dy 0.01;
+ycells #calc "abs(($ly)/($dy))";
+
+//For block 2
+lx1 #calc "$xmax1 - $xmin1";
+//dx 0.04;
+dx 0.02;
+//dx 0.01;
+xcells1 #calc "abs(($lx1)/($dx))";
+
+ly1 #calc "$ymax1 - $ymin1";
+//dy 0.04;
+dy 0.02;
+//dy 0.01;
+ycells1 #calc "abs(($ly1)/($dy))";
+
+//lz #calc "$zmax - $zmin";
+//dz 1;
+//zcells #calc "abs($lz/$dz)";
+
+vertices        
+(
+    ($xmin  $ymin  $zmin)	//0
+    ($xmax  $ymin  $zmin)	//1
+    ($xmax  $ymax  $zmin)	//2
+    ($xmin  $ymax  $zmin)	//3
+    ($xmin  $ymin  $zmax)	//4
+    ($xmax  $ymin  $zmax)	//5
+    ($xmax  $ymax  $zmax)	//6
+    ($xmin  $ymax  $zmax)	//7
+
+    ($xmin1  $ymin1  $zmin1)	//8
+    ($xmax1  $yangle $zmin1)	//9
+    ($xmax1  $ymax1  $zmin1)	//10
+    ($xmin1  $ymax1  $zmin1)	//11
+    ($xmin1  $ymin1  $zmax1)	//12
+    ($xmax1  $yangle $zmax1)	//13
+    ($xmax1  $ymax1  $zmax1)	//14
+    ($xmin1  $ymax1  $zmax1)	//15
+);
+
+blocks          
+(
+    hex (0 1 2 3 4 5 6 7) ($xcells $ycells $zcells) simpleGrading (1 1 1)	//(1 10 1)
+    hex (8 9 10 11 12 13 14 15) ($xcells1 $ycells1 $zcells) simpleGrading (1 1 1)
+);
+
+edges           
+(
+);
+
+boundary       
+(
+
+    inlet
+    {
+	type patch;
+        faces ((0 4 7 3));
+    }
+
+    //maxX
+    interface1
+    {
+	type patch;
+        faces ((2 6 5 1));
+    }
+
+    sym
+    {
+	type patch;
+        faces ((1 5 4 0));
+    }
+
+    wedge
+    {
+	type patch;
+        faces ((9 13 12 8));
+    }
+
+    top
+    {
+	type patch;
+        faces ((3 7 6 2) (11 15 14 10));
+    }
+
+    back
+    {
+	type empty;
+        faces ((0 3 2 1) (8 11 10 9));
+    }
+
+    front
+    {
+	type empty;
+        faces ((4 5 6 7) (12 13 14 15));
+    }
+
+    //minX1
+    interface2
+    {
+	type patch;
+        faces ((8 12 15 11));
+    }
+
+    outlet
+    {
+	type patch;
+        faces ((10 14 13 9) );
+    }
+
+);
+
+mergePatchPairs 
+(
+    (interface1 interface2)
+);
+
+// ************************************************************************* //

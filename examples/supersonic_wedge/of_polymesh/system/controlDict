@@ -1,0 +1,250 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |				
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  9                                   	
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    format      ascii;
+    class       dictionary;
+    object      controlDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+application     rhoPimpleFoam;
+
+startFrom       startTime;
+//startFrom       latestTime;
+
+startTime       0;
+
+stopAt          endTime;
+//stopAt	  writeNow;
+
+endTime         1000;
+
+deltaT          1;
+
+writeControl    runTime;
+
+writeInterval   100;
+
+purgeWrite      0;
+
+writeFormat     ascii;	//ascii-binary
+
+writePrecision  10;
+
+writeCompression off;
+
+timeFormat      general;
+
+timePrecision   6;
+
+runTimeModifiable true;
+
+/*
+adjustTimeStep  yes;
+maxCo           1;
+maxDeltaT       1;
+*/
+
+// ************************************************************************* //
+
+functions
+{
+
+///////////////////////////////////////////////////////////////////////////
+/*
+    inMassFlow
+    {
+        type            surfaceFieldValue;
+        functionObjectLibs ("libfieldFunctionObjects.so");
+        enabled         true;
+
+        //writeControl     outputTime;
+	writeControl   timeStep;
+	writeInterval  1;
+
+        log             true;
+
+        writeFields     false;
+
+        regionType          patch;
+        name      in;
+
+	operation       sum;
+        fields
+        (
+            phi
+        );
+    }
+*/
+///////////////////////////////////////////////////////////////////////////
+
+///////////////////////////////////////////////////////////////////////////
+/*
+    outMassFlow
+    {
+        type            surfaceFieldValue;
+        functionObjectLibs ("libfieldFunctionObjects.so");
+        enabled         true;
+
+	//writeControl     outputTime;
+
+	writeControl   timeStep;
+	writeInterval  1;
+
+        log             yes;
+
+        writeFields     false;
+
+        regionType          patch;
+        name      out;
+
+	operation       sum;
+        fields
+        (
+            phi
+        );
+    }
+*/
+///////////////////////////////////////////////////////////////////////////
+
+///////////////////////////////////////////////////////////////////////////
+/*
+    fieldAverage
+    {
+        type            fieldAverage;
+        functionObjectLibs ("libfieldFunctionObjects.so");
+        enabled         true;
+        writeControl   outputTime;
+
+	//writeControl   timeStep;
+	//writeInterval  100;
+
+	//cleanRestart true;
+
+	//timeStart       20;
+	//timeEnd         200;
+
+        fields
+        (
+            U
+            {
+                mean        on;
+                prime2Mean  on;
+                base        time;
+            }
+
+            p
+            {
+                mean        on;
+                prime2Mean  on;
+                base        time;
+            }
+        );
+    }
+*/
+///////////////////////////////////////////////////////////////////////////
+
+///////////////////////////////////////////////////////////////////////////
+
+vorticity
+{
+    type vorticity;
+    functionObjectLibs ("libfieldFunctionObjects.so");
+    enabled 	true;
+    log		true;
+    writeControl outputTime;   
+}
+
+///////////////////////////////////////////////////////////////////////////
+
+///////////////////////////////////////////////////////////////////////////
+
+minmaxdomain_scalar
+{
+    type            volFieldValue;
+    libs            ("libfieldFunctionObjects.so");
+
+    enabled 	    true; 	//true or false
+    log             true;	//write to screen
+    
+    //writeControl    writeTime;
+    writeControl    timeStep;
+    writeInterval   1;
+
+    writeFields     false;	//write solution to field value - Not needed when only reporting value to screen
+
+    writeLocation   true;	//write location in the output file
+
+    //mode component;
+
+    regionType      all;
+
+    operation       none;
+
+    fields
+    (
+        p T rho
+    );
+}
+
+minmaxdomain_vector
+{
+    type            volFieldValue;
+    libs            ("libfieldFunctionObjects.so");
+
+    enabled 	    true; 	//true or false
+    log             true;	//write to screen
+    
+    //writeControl    writeTime;
+    writeControl    timeStep;
+    writeInterval   1;
+
+    writeFields     false;	//write solution to field value - Not needed when only reporting value to screen
+
+    writeLocation   true;	//write location in the output file
+
+    //mode component;
+
+    regionType      all;
+
+    operation       none;
+
+    fields
+    (
+        U
+    );
+}
+
+mindomain_scalar
+{
+    $minmaxdomain_scalar
+    operation       min;
+}
+
+mindomain_vector
+{
+    $minmaxdomain_vector
+    operation       minMag;
+}
+
+maxdomain_scalar
+{
+    $minmaxdomain_scalar
+    operation       max;
+}
+
+maxdomain_vector
+{
+    $minmaxdomain_vector
+    operation       maxMag;
+}
+
+///////////////////////////////////////////////////////////////////////////
+
+}
